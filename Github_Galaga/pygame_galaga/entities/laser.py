@@ -9,16 +9,18 @@ class Laser (pygame.sprite.Sprite):
         self.position = position
         self.screen = pygame.display.get_surface()
         self.sprite_sheet = sprite_sheet 
-        self.image = self.sprite_sheet.subsurface(307, 118, self.game.settings.SPRITE_SIZE, self.game.settings.SPRITE_SIZE)
-        self.image = pygame.transform.scale(self.image, (40, 40)) 
+        from utils.sprite_defs import SPRITES
+        coords = SPRITES["laser"][0]
+        self.image = self.sprite_sheet.subsurface(coords["x"], coords["y"], coords["w"], coords["h"])
+        self.image = pygame.transform.scale(self.image, (40, 40))
         self.image.set_colorkey(self.game.settings.BLACK)
         self.rect = self.image.get_rect(center=self.position)
         self.position = pygame.math.Vector2(self.rect.midtop)
         self.direction = pygame.math.Vector2()
         self.velocity = 180
-        self.direction.y = -4        
+        self.direction.y = -4
 
-        # Generar la máscara para el láser
+    # Generar la máscara para el láser
         self.mask = pygame.mask.from_surface(self.image)
 
     def draw(self):

@@ -6,7 +6,7 @@ import os
 # Configuración inicial
 pygame.init()
 pygame.display.set_caption('Curvas Bézier Editables con Tablas')
-WINDOW_SIZE = (650, 950)
+WINDOW_SIZE = (975, 1425)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 clock = pygame.time.Clock()
 
@@ -159,6 +159,8 @@ while running:
     # Dibujar las tablas para cada curva
     for i, curve in enumerate(curves):
         draw_table(curve, i, selected_cell, editing_cell)
+
+    pygame.draw.line(screen, WHITE, (WINDOW_SIZE[0] // 2, 425), (WINDOW_SIZE[0] // 2, 1500), 2)  # Línea divisoria
 
     # Manejar eventos
     for event in pygame.event.get():

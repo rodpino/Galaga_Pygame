@@ -19,13 +19,16 @@ class Player(pygame.sprite.Sprite):
         self.lives = 3
         self.laser_group = pygame.sprite.Group()
         #self.sprite_sheet = pygame.image.load("/Users/rodrigopino/Documents/Github/pygame_galaga/pygame_galaga/asset/Galaga_SpritesSheet.png").convert_alpha()
-        self.nave_1 = self.sprite_sheet.subsurface(109, 1, self.game.settings.SPRITE_SIZE, self.game.settings.SPRITE_SIZE)
-        self.nave_2 = self.sprite_sheet.subsurface(109, 19, self.game.settings.SPRITE_SIZE, self.game.settings.SPRITE_SIZE)
-        self.nave_1 = pygame.transform.scale(self.nave_1, (self.game.settings.PLAYER_SIZE)) 
-        self.nave_2 = pygame.transform.scale(self.nave_2, (self.game.settings.PLAYER_SIZE)) 
+        from utils.sprite_defs import SPRITES
+        self.frames = [
+            pygame.transform.scale(
+                sprite_sheet.subsurface(f["x"], f["y"], f["w"], f["h"]),
+                self.game.settings.PLAYER_SIZE
+            )
+            for f in SPRITES["player"]
+        ]
         self.index = 0
-
-        self.image = self.nave_1
+        self.image = self.frames[self.index]
         self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect(center=(self.game.settings.WIDTH / 2, self.game.settings.HEIGHT - 95))
         self.direction = pygame.math.Vector2()
@@ -43,19 +46,16 @@ class Player(pygame.sprite.Sprite):
         
         # atricutis rotate_palyer
         
-        self.sprite = self.nave_2
+        self.sprite = self.frames[1]
         self.duration = 2
-        
         self.rotation_speed = 80
         self.start_time = None
         self.elapsed_time = 0
         self.angle = 0
-   
-        
         self.active_rotation = False  # Indica si la rotación está activa
-        
-        
-        
+            
+            
+            
                 
     def player_input(self):
         self.keys = pygame.key.get_pressed()
@@ -87,13 +87,11 @@ class Player(pygame.sprite.Sprite):
 
     def draw_life_player(self):
         """dibuja vidas del player"""
+        life_sprite = pygame.transform.scale(self.frames[0], (25, 25))
         for i in range(self.lives):
-            self.nave_1 = pygame.transform.scale(self.nave_1, (25 , 25))
-            
-            x = 10 + i * (self.nave_1.get_width() + 5)
+            x = 10 + i * (life_sprite.get_width() + 5)
             y = self.game.settings.HEIGHT - 30
-            self.screen.blit(self.nave_1, (x, y))
-            
+            self.screen.blit(life_sprite, (x, y))
         if self.lives == 0 or len(self.game.formation.aliens) == 0:
             self.game.resources.game_over()  # Llama a la función para mostrar el texto "Game Over"
      

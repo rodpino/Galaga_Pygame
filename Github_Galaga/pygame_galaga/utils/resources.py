@@ -22,11 +22,11 @@ class Resources():
         self.high_score = self.load_high_score()
 
         # Fuente para mostrar el puntaje
-        self.FONT_score = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 20)
+        self.FONT_score = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 30)
 
         # Fuente para mostrar el mIndex
-        self.FONT = pygame.font.SysFont(None, 30)
-        self.font = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 8)
+        self.FONT = pygame.font.SysFont(None, 35)
+        self.font = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 28)
 
     def get_sprite(self, coordinates, sprite_size):
         """Extrae el sprite de la hoja de sprites dado un rectángulo de coordenadas."""
@@ -47,20 +47,20 @@ class Resources():
                 alien_type = alien.alien_type
 
                 # Manejar las colisiones
-                if alien.alien_type == "boss_blue" and alien.hit_count == 2:
+                if alien.alien_type == "alien_boss_blue" and alien.hit_count == 2:
                     # Si es el segundo impacto, eliminar el alien
                     alien.kill()
 
 
                 # Asignar puntos según el color del alien
-                if alien_type == "blue":
+                if alien_type == "butterfly_blue":
                     if alien.attack_mode:
                         self.score += 100
                     else:
                         self.score += 50
                     alien.kill()
 
-                elif alien_type == "red":
+                elif alien_type == "butterfly_red":
                     if alien.attack_mode:
                         self.score += 160
                     else:
@@ -134,7 +134,7 @@ class Resources():
         high_score_text = self.FONT_score.render(f"{self.high_score}", True, self.game.settings.WHITE)
 
         # Posición fija para "HIGH SCORE"
-        score_text_3_x = 250
+        score_text_3_x = self.game.settings.WIDTH // 2 - (high_score_text_3.get_width() // 2)
 
         # Calcular la posición centrada para high_score_text en relación a "HIGH SCORE"
         score_text_3_width = high_score_text_3.get_width()  # Ancho del texto "HIGH SCORE"
@@ -150,11 +150,11 @@ class Resources():
 
         # Dibujar el texto en pantalla
         self.screen.blit(high_score_text_3, (score_text_3_x, 15))
-        self.screen.blit(high_score_text, (centered_high_score_x, 45))
+        self.screen.blit(high_score_text, (centered_high_score_x, 55))
         self.screen.blit(score_text, (30, 15))
-        self.screen.blit(score_text_2, (centered_score_x, 45))
+        self.screen.blit(score_text_2, (centered_score_x, 55))
 
-    def debug(self, info, y=480, x=60, font_size=50, color="white", bg_color=None):
+    def debug(self, info, y=480, x=60, font_size=150, color="white", bg_color=None):
 
         # Crear una fuente para el texto de depuración.
         font = pygame.font.Font(None, font_size)  # Fuente con el tamaño especificado.

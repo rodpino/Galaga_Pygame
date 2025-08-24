@@ -3,9 +3,9 @@
 class Settings():
     def __init__(self):
         # Nuevo tamaño de display (aumentado ~23%)
-        factor = 1.5
-        self.WIDTH = 975
-        self.HEIGHT = 1425
+        factor = 1.6
+        self.WIDTH = 1100
+        self.HEIGHT = 1600
         self.FPS = 60
         
         self.SPRITE_SIZE = int(16 * factor)

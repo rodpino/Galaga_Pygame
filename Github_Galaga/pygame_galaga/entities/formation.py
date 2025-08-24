@@ -1,14 +1,15 @@
 import pygame
 import random
 from entities.alien import Alien
+from config.formation_layout import LAYOUT, to_pixels
 
 class Formation:
     def __init__(self, game):
         self.game = game
         self.sprite_sheet = game.sprite_sheet
         self.aliens = pygame.sprite.Group()  # Grupo de sprites para los alienígenas
-        self.grid_size_x = 20.0
-        self.grid_size_y = 35.0
+        self.grid_size_x = 50.0
+        self.grid_size_y = 70.0
 
         # Movimiento lateral del grid durante la llegada de los aliens
         self.move_distance = 40  # Distancia total de movimiento lateral del grid
@@ -20,13 +21,17 @@ class Formation:
         # Movimiento lateral después de que los aliens hayan llegado
         self.aliens_arrived = False  # Indica si todos los aliens han llegado
 
-        self.initial_target_positions = []  # Posiciones objetivo iniciales (sin movimiento)
-        self.create_formation()
+        # Posiciones iniciales cargadas desde layout externo
+        self.initial_target_positions = []
+        self.load_layout_and_create()
 
         # Variables para el patrón de expansión continuo
         self.expanding = False
         self.expansion_duration = 2.0  # Duración total de cada ciclo de expansión
         self.expansion_elapsed = 0.0
+        # Amplitudes configurables de expansión (ajustadas a menor valor)
+        self.expansion_h_amplitude = 90 # antes 60
+        self.expansion_v_factor = 0.8    # factor de grid_size_y (antes 0.5)
 
         # Fases de llegada de alienígenas
         self.current_phase = 0  # Índice de la fase actual
@@ -37,80 +42,41 @@ class Formation:
         self.attack_interval = random.uniform(1.0, 2.0)
         self.attack_formations = []
         self.define_attack_formations()
-        self.allowed_attack_types = ['red', 'blue', 'boss_green', 'boss_green, red, red']
-        #self.curvas_relativas = Curvas_relativas (self)
+        self.allowed_attack_types = ['butterfly_red', 'butterfly_blue', 'alien_boss_green', 'alien_boss_green, butterfly_red, butterfly_red']
+        # self.curvas_relativas = Curvas_relativas(self)
     
     def create_formation(self):
-        """Crear alienígenas y calcular sus posiciones objetivo."""
-        self.add_aliens_to_group("red", 16)
-        self.add_aliens_to_group("blue", 20, offset=16)
-        self.add_aliens_to_group("boss_green", 4, offset=36)
+        # Obsoleto: ahora se usa load_layout_and_create
+        pass
 
-    def add_aliens_to_group(self, alien_type, count, offset=0):
-        """Agrega un grupo de alienígenas a la formación."""
-        for mIndex in range(count):
-            bezier_id = mIndex
-            x, y = self.calculate_target_position(mIndex, alien_type)
-            self.initial_target_positions.append((x, y))
-            alien = Alien(mIndex + offset, self, alien_type, bezier_id, self.game, self.sprite_sheet)
+    def add_aliens_to_group(self, *args, **kwargs):
+        # Conservado por compatibilidad si se invoca desde otro módulo
+        return
+
+    def load_layout_and_create(self):
+        if not LAYOUT:
+            return
+        max_index = max(e["mIndex"] for e in LAYOUT)
+        self.initial_target_positions = [None] * (max_index + 1)
+        # Contadores por tipo para asignar bezier_id locales (evita delays enormes por usar mIndex global)
+        type_counters = {}
+        for entry in LAYOUT:
+            mIndex = entry["mIndex"]
+            alien_type = entry["alien_type"]
+            rel_x, y_px = to_pixels(entry, self.grid_size_y)
+            screen_x = rel_x + self.game.settings.WIDTH // 2
+            screen_y = y_px
+            self.initial_target_positions[mIndex] = (screen_x, screen_y)
+            # Asignar bezier_id incremental por tipo
+            bezier_id = type_counters.get(alien_type, 0)
+            type_counters[alien_type] = bezier_id + 1
+            alien = Alien(mIndex, self, alien_type, bezier_id, self.game, self.sprite_sheet)
             self.aliens.add(alien)
 
-    def calculate_target_position(self, mIndex, alien_type):
+    
+
+    
         
-        if alien_type == "boss_green":
-            # Posicionar los 4 alienígenas verdes en una sola fila con simetría alrededor del centro
-            row = 1  # Fila específica para los alienígenas verdes (tercera fila, indexada como 2)
-            
-            # Alternar la posición en X para cada alien en el grupo de 4
-            if mIndex == 0 or mIndex == 2:
-                # Lado izquierdo
-                sign = -1
-            else:
-                # Lado derecho
-                sign = 1
-
-            # Asignar el desplazamiento horizontal basado en el índice
-            col = mIndex // 2  # 0 o 1 para cada par de alienígenas en el lado izquierdo y derecho
-            retVal_x = (self.grid_size_x + self.grid_size_x * 2 * col) * sign
-            print (retVal_x)
-            # Asignar la posición en Y para la única fila de alienígenas verdes
-            retVal_y = (row * self.grid_size_y) + 70
-        
-        else:
-            group = mIndex // 4
-            pos_in_group = mIndex % 4
-
-            # Posición en Y
-            if pos_in_group == 0 or pos_in_group == 1:
-                retVal_y = self.grid_size_y * 0  # Primera fila
-            else:
-                retVal_y = self.grid_size_y * 1  # Segunda fila
-
-            # Alternar posición en X para cada alien en el grupo
-            if pos_in_group == 0 or pos_in_group == 2:
-                # Lado izquierdo
-                sign = -1
-            else:
-                # Lado derecho
-                sign = 1
-
-            retVal_x = (self.grid_size_x + self.grid_size_x * 2 * group) * sign
-
-            # Ajustar posiciones para la pantalla
-            screen_x = retVal_x + self.game.settings.WIDTH // 2
-            screen_y = retVal_y + 180  # Posición objetivo en Y
-            
-            if alien_type == "blue":
-                screen_y += 70
-            # elif alien_type == "boss_green":
-            #     screen_y += 350
-            return int(screen_x), int(screen_y)
-        
-        # Ajustar posiciones para la pantalla para los alienígenas verdes
-        screen_x = retVal_x + self.game.settings.WIDTH // 2
-        screen_y = retVal_y  # Posición objetivo en Y para los alienígenas verdes
-
-        return int(screen_x), int(screen_y)
 
     def get_initial_target_position(self, mIndex):
         return self.initial_target_positions[mIndex]
@@ -123,11 +89,11 @@ class Formation:
         return center_x, center_y
 
     def get_adjusted_index(self, alien):
-        if alien.alien_type == "red":
+        if alien.alien_type == "butterfly_red":
             group = alien.mIndex // 4
-        elif alien.alien_type == "blue":
+        elif alien.alien_type == "butterfly_blue":
             group = (alien.mIndex - 16) // 4  # Ajuste para los alienígenas azules
-        elif alien.alien_type == "boss_green":
+        elif alien.alien_type == "alien_boss_green":
             group = (alien.mIndex - 36) // 4
         else:
             group = 0  # Valor por defecto para otros tipos de alienígenas              
@@ -140,7 +106,7 @@ class Formation:
         return all(alien.arrived for alien in self.aliens)
 
     def apply_expansion(self, delta_time):
-        #"""Aplica la expansión a todos los aliens en la formación."""
+        # Expansión basada en posición relativa al centro del layout
         self.expansion_elapsed += delta_time
         if self.expansion_elapsed >= self.expansion_duration:
             self.expansion_elapsed = 0.0
@@ -148,29 +114,27 @@ class Formation:
         progress = self.expansion_elapsed / self.expansion_duration
         expansion_progress = progress / 0.5 if progress < 0.5 else (1 - (progress - 0.5) / 0.5)
 
+        try:
+            center_x, _ = self.get_grid_center()
+            max_span = max(abs(x - center_x) for x, _ in self.initial_target_positions if x is not None) or 1
+        except Exception:
+            center_x = self.game.settings.WIDTH // 2
+            max_span = 1
+
+        base_amplitude = self.expansion_h_amplitude
+        vertical_amplitude = int(self.grid_size_y * self.expansion_v_factor)
+
         for alien in self.aliens:
-            if not alien.attack_mode:
-                adjusted_index = self.get_adjusted_index(alien)
-                sign = -1 if alien.is_left_alien() else 1
-                max_offset = sign * 30 * ((adjusted_index + 1) / 4)
-
-                # Aplicar modificaciones específicas por tipo
-                if alien.alien_type == "red" and alien.mIndex in [0, 1, 2, 3]:
-                    max_offset *= 0.5
-                if alien.alien_type == "blue" and alien.mIndex in [16, 17, 18, 19]:
-                    max_offset *= 0.5
-                if alien.alien_type == "boss_green" and alien.mIndex in [36, 37]:
-                    max_offset *= 0.5
-                if alien.alien_type == "boss_green" and alien.mIndex in [38, 39]:
-                    max_offset *= 2
-
-                alien.expansion_offset = max_offset * expansion_progress
-                alien.expansion_offset_y = 25 * expansion_progress
-            else:
-                # Si el alien está en modo ataque, restablecer los desplazamientos de expansión
-                alien.expansion_offset = 0.0
-                alien.expansion_offset_y = 0.0
-               # Actualizar movimiento lateral del grid si está activo
+            rel_x = alien.initial_target_x - center_x
+            radial = abs(rel_x) / max_span
+            radial_adjusted = (0.02 + 0.6 * radial)
+            sign = -1 if rel_x < 0 else 1
+            max_offset = sign * base_amplitude * radial_adjusted
+            if alien.attack_mode and not getattr(alien, 'returning_to_grid', False):
+                max_offset *= 0.3
+            alien.expansion_offset = max_offset * expansion_progress
+            vy_amp = vertical_amplitude * (0.4 if alien.attack_mode else 1.0)
+            alien.expansion_offset_y = vy_amp * expansion_progress
         
     def update_arrival_phases(self, delta_time):
         
@@ -179,37 +143,36 @@ class Formation:
         # Fase 1: Alienígenas rojos 0-3
             if all(alien.arrived for alien in self.aliens if alien.mIndex in [0, 1, 2, 3]):
                 self.current_phase += 1
-                self.reset_start_time("blue", [0, 1, 2, 3])
+                self.reset_start_time("butterfly_blue", [0, 1, 2, 3])
                
 
         elif self.current_phase == 1:
             # Fase 2: Alienígenas azules 16-19
             if all(alien.arrived for alien in self.aliens if alien.mIndex in [16, 17, 18, 19]):
                 self.current_phase += 1
-                self.reset_start_time("red", [4, 5, 6, 7])
-                self.reset_start_time("boss_green", [0, 1, 2, 3])
+                self.reset_start_time("butterfly_red", [4, 5, 6, 7])
+                self.reset_start_time("alien_boss_green", [0, 1, 2, 3])
                     
 
         elif self.current_phase == 2:
             # Fase 3: Alienígenas rojos 4-7 y verdes 36-39
             if all(alien.arrived for alien in self.aliens if alien.mIndex in [4, 5, 6, 7, 36, 37, 38, 39]):
                 self.current_phase += 1
-                self.reset_start_time("red", range(8, 16), )
+                self.reset_start_time("butterfly_red", range(8, 16), )
                 
 
         elif self.current_phase == 3:
             # Fase 4: Alienígenas rojos 8-15
             if all(alien.arrived for alien in self.aliens if alien.mIndex in range(8, 16)):
                 self.current_phase += 1
-                self.reset_start_time("blue", range(4, 12))
-                
+                self.reset_start_time("butterfly_blue", range(4, 12))
+
 
         elif self.current_phase == 4:
             # Fase 5: Alienígenas azules 20-27
             if all(alien.arrived for alien in self.aliens if alien.mIndex in range(20, 28)):
                 self.current_phase += 1
-                self.reset_start_time("blue", range(12, 20))
-                
+                self.reset_start_time("butterfly_blue", range(12, 20))
 
         elif self.current_phase == 5:
             # Fase 6: Alienígenas azules 28-35
@@ -239,14 +202,14 @@ class Formation:
     def define_attack_formations(self):
         # Definir las formaciones de ataque
         self.attack_formations = [
-            ['red'],
-            ['blue'],
-            ['boss_green'],
-            ['boss_blue'],
-            ['boss_green', 'red'],
-            ['boss_green', 'red', 'red'],
-            ['boss_blue', 'red'],
-            ['boss_blue', 'red', 'red']
+            ['butterfly_red'],
+            ['butterfly_blue'],
+            ['alien_boss_green'],
+            ['alien_boss_blue'],
+            ['alien_boss_green', 'butterfly_red'],
+            ['alien_boss_green', 'butterfly_red', 'butterfly_red'],
+            ['alien_boss_blue', 'butterfly_red'],
+            ['alien_boss_blue', 'butterfly_red', 'butterfly_red']
             # Agrega más formaciones según necesites
         ]    
         # Cuanto mayor sea el peso, mayor será la probabilidad de selección
@@ -262,12 +225,12 @@ class Formation:
                 self.attack_interval = random.uniform(0.5, 1.0)
                 # Seleccionar una formación de ataque al azar
                 formation = random.choices(self.attack_formations, weights=self.attack_weights, k=1)[0]
-                if formation == ['boss_green', 'red', 'red'] or formation == ['boss_green', 'red'] or formation == ['boss_blue', 'red'] or formation == ['boss_blue', 'red', 'red']:
+                if formation == ['alien_boss_green', 'butterfly_red', 'butterfly_red'] or formation == ['alien_boss_green', 'butterfly_red'] or formation == ['alien_boss_blue', 'butterfly_red'] or formation == ['alien_boss_blue', 'butterfly_red', 'butterfly_red']:
                     self.initiate_combined_attack_formation(formation)
-                elif formation == ['boss_green'] or formation == ['boss_blue']:
+                elif formation == ['alien_boss_green'] or formation == ['alien_boss_blue']:
                     self.capture_formation(formation)
-                elif formation == ['red'] or formation == ['blue']:
-                    #self.capture_formation(formation)   
+                elif formation == ['butterfly_red'] or formation == ['butterfly_blue']:
+                    #self.capture_formation(formation)
                     self.initiate_attack_formation(formation)
                 
                     
@@ -469,11 +432,12 @@ class Formation:
         # Actualizar fases de llegada
         self.update_arrival_phases(delta_time)
         
-        # Aplicar expansión continua
+    # Aplicar expansión continua
         self.apply_continuous_expansion(delta_time)
-        
-        #self.apply_lateral_movement_to_aliens()
-        
+
+        # Aplicar desplazamiento lateral calculado a cada alien
+        self.apply_lateral_movement_to_aliens()
+            
         # Actualizar fases de ataque
         self.update_attack_phases(delta_time)
         

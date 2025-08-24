@@ -16,10 +16,10 @@ class Alien(pygame.sprite.Sprite):
 
     # Variables de clase para los sprites
     animation_frames_by_type = {
-        "red": [],
-        "blue": [],
-        "boss_green": [],
-        "boss_blue": []
+        "butterfly_red": [],
+        "butterfly_blue": [],
+        "alien_boss_green": [],
+        "alien_boss_blue": []
     }
 
     def __init__(self, mIndex, formation, alien_type, bezier_id, game, sprite_sheet):
@@ -119,12 +119,13 @@ class Alien(pygame.sprite.Sprite):
     #     self.capture_player.define_capture_curves_2()  # Llama a la captura específica
     def on_laser_hit(self):
         """Maneja lo que sucede cuando el alien es impactado por un láser."""
-        if self.alien_type == "boss_green" and self.hit_count == 0:
+        if self.alien_type == "alien_boss_green" and self.hit_count == 0:
             # Primer impacto: cambiar de boss_green a boss_blue
-            self.alien_type = "boss_blue"
-            self.animation_frames = Alien.animation_frames_by_type["boss_blue"]
+            self.alien_type = "alien_boss_blue"
+            self.load_animation_frames()
+            self.animation_frames = Alien.animation_frames_by_type["alien_boss_blue"]
             self.hit_count += 1
-        elif self.alien_type == "boss_blue" and self.hit_count == 1:
+        elif self.alien_type == "alien_boss_blue" and self.hit_count == 1:
             
             if self.formation.attack_mode:
                 self.formation.game.score += 400
@@ -135,49 +136,31 @@ class Alien(pygame.sprite.Sprite):
             self.kill()
 
     def load_animation_frames(self):
-        """Carga los frames de animación de los sprites."""
+        """Carga los frames de animación de los sprites usando SPRITES."""
+        from utils.sprite_defs import SPRITES
         if not Alien.animation_frames_by_type[self.alien_type]:
-            if self.alien_type == "red":
-                Alien.animation_frames_by_type["red"] = [
-                    self.game.resources.get_sprite((109, 73, 16, 16), (self.game.settings.ALIENS_SIZE)),
-                    self.game.resources.get_sprite((127, 73, 16, 16), (self.game.settings.ALIENS_SIZE))
-                ]
-            elif self.alien_type == "blue":
-                Alien.animation_frames_by_type["blue"] = [
-                    self.game.resources.get_sprite((109, 91, 16, 16), (self.game.settings.ALIENS_SIZE)),
-                    self.game.resources.get_sprite((127, 91, 16, 16), (self.game.settings.ALIENS_SIZE))
-                ]
-            elif self.alien_type == "boss_green":
-                Alien.animation_frames_by_type["boss_green"] = [
-                    self.game.resources.get_sprite((109, 37, 16, 16), (self.game.settings.ALIENS_SIZE)),
-                    self.game.resources.get_sprite((127, 37, 16, 16), (self.game.settings.ALIENS_SIZE))
-                ]
-                Alien.animation_frames_by_type["boss_blue"] = [
-                    self.game.resources.get_sprite((109, 55, 16, 16), (self.game.settings.ALIENS_SIZE)),
-                    self.game.resources.get_sprite((127, 55, 16, 16), (self.game.settings.ALIENS_SIZE))
-                ]
-
+            Alien.animation_frames_by_type[self.alien_type] = [
+                pygame.transform.scale(
+                    self.sprite_sheet.subsurface(f["x"], f["y"], f["w"], f["h"]),
+                    self.game.settings.ALIENS_SIZE
+                )
+                for f in SPRITES[self.alien_type]
+            ]
         if not self.capture_animation_frames:
             self.capture_animation_frames = [
-            self.game.resources.get_sprite((289, 36, 48, 80), self.game.settings.CAPTURE_SIZE),
-            self.game.resources.get_sprite((339, 36, 48, 80), self.game.settings.CAPTURE_SIZE),
-            self.game.resources.get_sprite((389, 36, 48, 80), self.game.settings.CAPTURE_SIZE)
-        ]
-        
-            
-            for key in Alien.animation_frames_by_type:
-                frames = Alien.animation_frames_by_type[key]
-                for i in range(len(frames)):
-                    frames[i] = frames[i].convert_alpha()
+                self.game.resources.get_sprite((289, 36, 48, 80), self.game.settings.CAPTURE_SIZE),
+                self.game.resources.get_sprite((339, 36, 48, 80), self.game.settings.CAPTURE_SIZE),
+                self.game.resources.get_sprite((389, 36, 48, 80), self.game.settings.CAPTURE_SIZE)
+            ]
             
     def define_curves_and_position(self):
         """Define las curvas y la posición inicial del alien."""
         # Definir curvas basadas en el tipo de alien
-        if self.alien_type == "red":
+        if self.alien_type == "butterfly_red":
             self.define_red_curves()
-        elif self.alien_type == "blue":
+        elif self.alien_type == "butterfly_blue":
             self.define_blue_curves()
-        elif self.alien_type == "boss_green":
+        elif self.alien_type == "alien_boss_green":
             self.define_boss_green_curves()  
         
             self.start_x, self.start_y = self.curves[0][0]
@@ -290,13 +273,13 @@ class Alien(pygame.sprite.Sprite):
 
             # Ajustar global_animation_index para no exceder el tamaño de los frames de animación
             # Suponemos que todos los tipos tienen la misma cantidad de frames
-            max_index = len(cls.animation_frames_by_type["red"])
+            max_index = len(cls.animation_frames_by_type["butterfly_red"])
             cls.global_animation_index = (cls.global_animation_index + 1) % max_index
 
 
 
     def define_attack_curves_1_1(self, offset_x=0):
-        if self.alien_type == "red" or "blue":
+        if self.alien_type == "butterfly_red" or self.alien_type == "butterfly_blue":
             self.attack_curves = [
                 self.alien_attack_curves.attack_control_points_1_1(offset_x),
                 self.alien_attack_curves.attack_control_points_1_2(offset_x),
@@ -305,7 +288,7 @@ class Alien(pygame.sprite.Sprite):
             ]
             
     def define_attack_curves_2_1(self, offset_x=0):
-        if self.alien_type == "red"or "blue":
+        if self.alien_type == "butterfly_red" or self.alien_type == "butterfly_blue":
             self.attack_curves = [
                 self.alien_attack_curves.attack_control_points_2_1(offset_x),
                 self.alien_attack_curves.attack_control_points_2_2(offset_x),
@@ -314,7 +297,7 @@ class Alien(pygame.sprite.Sprite):
             ]
 
     def define_attack_curves(self, offset_x=0):
-        if self.alien_type == "blue":
+        if self.alien_type == "butterfly_blue":
             self.attack_curves = [
                 self.alien_attack_curves.attack_control_points_1_1(offset_x),
                 self.alien_attack_curves.attack_control_points_1_2(offset_x),
@@ -322,9 +305,9 @@ class Alien(pygame.sprite.Sprite):
                 self.alien_attack_curves.attack_control_points_1_4(offset_x)
             ]
 
-    def define_attack_curves_2(self, offset_x=0 ) : 
-        random_xx =  random.randint(-50, 120)
-        if self.alien_type == "blue":
+    def define_attack_curves_2(self, offset_x=0):
+        random_xx = random.randint(-50, 120)
+        if self.alien_type == "butterfly_blue":
             self.attack_curves = [
                 self.alien_attack_curves.attack_control_points_4(random_xx, offset_x),
                 self.alien_attack_curves.attack_control_points_5(random_xx, offset_x),
@@ -333,8 +316,8 @@ class Alien(pygame.sprite.Sprite):
             ]
 
     def define_attack_curves_3(self, offset_x=0):
-        random_xx =  random.randint(-150, 50)
-        if self.alien_type == "blue":
+        random_xx = random.randint(-150, 50)
+        if self.alien_type == "butterfly_blue":
             self.attack_curves = [
                 self.alien_attack_curves.attack_control_points_8(random_xx, offset_x),
                 self.alien_attack_curves.attack_control_points_9(random_xx, offset_x),
@@ -414,7 +397,7 @@ class Alien(pygame.sprite.Sprite):
     
     
     def debug_2(self, surface):
-        if self.alien_type == 'red' or self.alien_type == 'boss_blue':
+        if self.alien_type == 'butterfly_red' or self.alien_type == 'alien_boss_blue':
             # Crear una lista con los nombres y valores de las variables
             debug_info = [
                 #f"attack_t: {self.attack_t:.2f}",
@@ -458,7 +441,7 @@ class Alien(pygame.sprite.Sprite):
     def update(self, delta_time):
         
         # Actualizar la imagen del alien si ha cambiado el tipo
-        if self.alien_type == "boss_blue" and self.hit_count == 1:
+        if self.alien_type == "alien_boss_blue" and self.hit_count == 1:
             self.image = self.animation_frames[0]
         
         self.time_since_start += delta_time
@@ -530,8 +513,8 @@ class Alien(pygame.sprite.Sprite):
                     dx, dy = derivative
                     angle = np.degrees(np.arctan2(dy, dx))
                     self.angle = angle + 90
-                    
-                    if self.curve_attack_index == 1 and self.alien_type == 'boss_green' and self.is_capture_formation or self.alien_type == "boss_blue" and self.is_capture_formation:
+
+                    if self.curve_attack_index == 1 and self.alien_type == 'alien_boss_green' and self.is_capture_formation or self.alien_type == "alien_boss_blue" and self.is_capture_formation:
                         # Aquí puedes modificar el ángulo según necesites
                         # Por ejemplo, agregar un ángulo fijo
                         self.angle = 180
@@ -541,7 +524,7 @@ class Alien(pygame.sprite.Sprite):
 
                     if self.attack_t >= 1.0:
                         # Verificar si necesitamos pausar
-                        if self.curve_attack_index == 0 and self.alien_type == "boss_green" and self.is_capture_formation:
+                        if self.curve_attack_index == 0 and self.alien_type == "alien_boss_green" and self.is_capture_formation:
                             self.pausing = True
                             self.pause_start_time = None
                             # Mantener la posición al final de la primera curva
@@ -634,8 +617,10 @@ class Alien(pygame.sprite.Sprite):
             #self.attack_mode = True
 
         # Actualizar el frame de animación
-        rotated_image = pygame.transform.rotate(self.animation_frames[Alien.global_animation_index], -self.angle)
-        self.image = rotated_image
+        if self.animation_frames:
+            index = Alien.global_animation_index % len(self.animation_frames)
+            rotated_image = pygame.transform.rotate(self.animation_frames[index], -self.angle)
+            self.image = rotated_image
         self.rect = self.image.get_rect(center=(int(self.x), int(self.y)))
 
         # Actualizar la máscara para la colisión
@@ -662,18 +647,15 @@ class Alien(pygame.sprite.Sprite):
 
     def draw(self, surface):
         if self.active or self.arrived or self.attack_mode or self.pausing:
-            
-            # Obtener el frame de animación actual
-            
             frames = self.animation_frames_by_type[self.alien_type]
-            self.image = frames[self.global_animation_index]
-            
-          
+            if not frames:
+                return  # No hay frames para este tipo de alien
+            index = self.global_animation_index % len(frames)
+            self.image = frames[index]
             # Rotar la imagen
             self.rotated_image = pygame.transform.rotate(self.image, -self.angle)
             rect = self.rotated_image.get_rect(center=(int(self.x), int(self.y)))
             surface.blit(self.rotated_image, rect)
-            
             if self.pausing and self.capture_animation_frame:
                 # Dibujar la animación de captura en la parte inferior central del alienígena
                 animation_frame = self.capture_animation_frame

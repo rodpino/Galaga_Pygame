@@ -10,127 +10,127 @@ class Grid_formation_curves:
     def control_points_1(self):
         """ superior izquierdo """
         return np.array([
-            [188, -10],
-            [320, 230],
-            [560, 260],
-            [580, 450]
+            [350, -10],
+            [445, 390],
+            [907, 400],
+            [900, 620]
         ])
 
     def control_points_2(self):
         """ superior izquierdo """
         return np.array([
-            [580, 450],
-            [592, 638],
-            [352, 657],
-            [342, 463]
+            [900, 620],
+            [925, 850],
+            [657, 879],
+            [610, 710]
         ])
 
     def control_points_3(self):
         """ loop izquierdo """
         return np.array([
-            ([-5, 706]),
-            ([205, 659]),
-            ([263, 524]),
-            ([212, 463])
+            ([ -5, 1305]),
+            ([315, 1180]),
+            ([480,  1000]),
+            ([490,  765])
         ])
 
     def control_points_4(self):
         """ loop izquierdo """
         return np.array([
-            ([212, 463]),
-            ([163, 356]),
-            ([15, 410]),
-            ([56, 517])
+            ([490, 765]),
+            ([470, 605]),
+            ([245, 625]),
+            ([230, 790])
         ])
 
     def control_points_5(self):
         """ loop izquierdo """
         return np.array([
-            ([56, 517]),
-            ([123, 619]),
-            ([248, 561]),
-            ([260, 463])
+            ([230, 790]),
+            ([200, 970]),
+            ([550,1040]),
+            ([480, 690])
         ])
 
     def control_points_6(self):
         """ loop derecho """
         return np.array([
-            ([self.width + 5, 706]),
-            ([self.width - 205, 659]),
-            ([self.width - 263, 524]),
-            ([self.width - 212, 463])
+            ([self.width   -5, 1305]),
+            ([self.width - 315, 1180]),
+            ([self.width - 480,  1000]),
+            ([self.width - 490,  765])
         ])
 
     def control_points_7(self):
         """ loop derecho """
         return np.array([
-            ([self.width - 212, 463]),
-            ([self.width - 163, 356]),
-            ([self.width - 15, 410]),
-            ([self.width - 56, 517])
+            ([self.width - 490, 765]),
+            ([self.width - 470, 605]),
+            ([self.width - 245, 625]),
+            ([self.width - 230, 790])
         ])
 
     def control_points_8(self):
         """ loop derecho """
         return np.array([
-            ([self.width - 56, 517]),
-            ([self.width - 123, 619]),
-            ([self.width - 248, 561]),
-            ([self.width - 260, 463])
+            ([self.width - 230, 790]),
+            ([self.width - 200, 970]),
+            ([self.width - 550,1040]),
+            ([self.width - 480, 690])
         ])
 
     def control_points_10(self):
         """ superior oblicuo izquierdo """
         return np.array([
-            [250, -10],
-            [320, 250],
-            [560, 195],
-            [580, 385]
+            [570, -10],
+            [540, 190],
+            [ 35, 490],
+            [ 30, 680]
         ])
 
     def control_points_11(self):
         """ superior oblicuo izquierdo """
         return np.array([
-            [580, 385],
-            [590, 650],
-            [280, 680],
-            [330, 415]
+            [ 30, 680],
+            [ 30, 865],
+            [245, 945],
+            [365, 725]
         ])
 
     def control_points_12(self):
         """ superior derecho """
         return np.array([
-            [self.width - 188, -10],
-            [self.width - 320, 230],
-            [self.width - 560, 260],
-            [self.width - 580, 450]
+            [self.width - 350, -10],
+            [self.width - 445, 390],
+            [self.width - 907, 400],
+            [self.width - 900, 620]
         ])
 
     def control_points_13(self):
         """ superior derecho """
         return np.array([
-            [self.width - 580, 450],
-            [self.width - 592, 638],
-            [self.width - 352, 657],
-            [self.width - 342, 463]
+            [self.width - 900, 620],
+            [self.width - 925, 850],
+            [self.width - 657, 879],
+            [self.width - 610, 710]
         ])
 
     def control_points_14(self):
         """ superior oblicuo derecho """
         return np.array([
-            [self.width - 250, -10],
-            [self.width - 320, 250],
-            [self.width - 560, 195],
-            [self.width - 580, 385]
+            [self.width - 570, -10],
+            [self.width - 540, 190],
+            [self.width -  35, 490],
+            [self.width -  30, 680]
         ])
 
     def control_points_15(self):
         """ superior oblicuo derecho """
         return np.array([
-            [self.width - 580, 385],
-            [self.width - 650, 650],
-            [self.width - 280, 680],
-            [self.width - 300, 415]
+            [self.width -  30, 680],
+            [self.width -  30, 865],
+            [self.width - 245, 945],
+            [self.width - 365, 725]
         ])
 
 

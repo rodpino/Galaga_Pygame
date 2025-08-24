@@ -30,7 +30,7 @@ class Game():
         self.settings = Settings()
         self.screen = pygame.display.set_mode((self.settings.WIDTH, self.settings.HEIGHT))
         pygame.display.set_caption("Galaga Pygame")
-
+        
         # Inicializar componentes del juego
         self.sprite_sheet = pygame.image.load(get_asset_path("Galaga_SpritesSheet.png")).convert_alpha()
         self.grid_formation_curves = Grid_formation_curves(self)
@@ -54,10 +54,10 @@ class Game():
 
         # Fuente para mostrar el mIndex
         self.FONT = pygame.font.SysFont(None, 39)
-        self.font = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 8)
+        self.font = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 138)
 
         # Fuente para mostrar el puntaje
-        self.FONT_score = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 20)
+        self.FONT_score = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 190)
         self.clock = pygame.time.Clock()
 
     def calculate_delta_time(self) -> float:
@@ -102,7 +102,7 @@ class Game():
         self.resources.show_fps(fps)
         for alien_sprite in self.formation.aliens:
             alien_sprite.laser_group.draw(self.screen)
-            if alien_sprite.alien_type == "boss_green" and alien_sprite.mIndex== 37:
+            if alien_sprite.alien_type == "alien_boss_green" and alien_sprite.mIndex== 37:
                 self.resources.debug(alien_sprite.rect.x)
                 
         

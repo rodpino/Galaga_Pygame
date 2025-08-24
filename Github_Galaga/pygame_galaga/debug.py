@@ -1,7 +1,6 @@
 import pygame
 pygame.init ()
 
-font = pygame.font.Font("Github/Galaga_Pygame/pygame_galaga/pygame_galaga/asset/fonts/emulogic.ttf", 8)
 
 def debug (info, y = 180, x = 20):
     screen = pygame.display.get_surface ()
@@ -12,7 +11,7 @@ def debug (info, y = 180, x = 20):
     
     
 def debug_2(self, surface):
-        if self.alien_type == 'boss_green':
+        if self.alien_type == 'alien_boss_green':
             # Crear una lista con los nombres y valores de las variables
             debug_info = [
                 #f"attack_t: {self.attack_t:.2f}",
