@@ -53,7 +53,7 @@ class Game():
         self.high_score = self.resources.load_high_score()
 
         # Fuente para mostrar el mIndex
-        self.FONT = pygame.font.SysFont(None, 39)
+        self.FONT = pygame.font.SysFont(None, 55)
         self.font = pygame.font.Font(get_asset_path("fonts", "emulogic.ttf"), 138)
 
         # Fuente para mostrar el puntaje
@@ -92,7 +92,9 @@ class Game():
 
     def render(self, fps):
         self.screen.fill(self.settings.BLACK)
+        
         self.background.draw()
+        self.screen.fill((255, 255, 255))
         self.formation.draw(self.screen)
         self.player_group.draw(self.screen)
         self.player.laser_group.draw(self.screen)

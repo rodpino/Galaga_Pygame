@@ -45,10 +45,7 @@ class Formation:
         self.allowed_attack_types = ['butterfly_red', 'butterfly_blue', 'alien_boss_green', 'alien_boss_green, butterfly_red, butterfly_red']
         # self.curvas_relativas = Curvas_relativas(self)
     
-    def create_formation(self):
-        # Obsoleto: ahora se usa load_layout_and_create
-        pass
-
+   
     def add_aliens_to_group(self, *args, **kwargs):
         # Conservado por compatibilidad si se invoca desde otro módulo
         return
@@ -319,7 +316,7 @@ class Formation:
     def initiate_combined_attack_formation(self, formation):
         # Obtener los índices de las formaciones específicas
         formations_indices = [
-            [38, 8, 4],
+            [38, 8, 5],
             [36, 4, 0],
             [37, 1, 5],
             [39, 5, 9],

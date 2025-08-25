@@ -397,33 +397,41 @@ class Alien(pygame.sprite.Sprite):
     
     
     def debug_2(self, surface):
-        if self.alien_type == 'butterfly_red' or self.alien_type == 'alien_boss_blue':
+        if self.alien_type == 'butterfly_red' or self.alien_type == 'alien_boss_blue'  or self.alien_type == 'butterfly_blue' or self.alien_type == 'alien_boss_green':
             # Crear una lista con los nombres y valores de las variables
             debug_info = [
                 #f"attack_t: {self.attack_t:.2f}",
-                f"tipo curva: {self.define_attack_curves}",
-                f"curve_attack_idx: {self.mIndex}",
-                f"curve_attack_idx: {self.curve_attack_index}",
-                f"reached_end: {self.reached_curve_end}",
-                f"pausing: {self.pausing}",
-                f"pause_start: {self.pause_start_time}",
-                f"is_capture: {self.is_capture_formation}"
+                # f"tipo curva: {self.define_attack_curves}",
+                f"- {self.mIndex}",
+                # f"curve_attack_idx: {self.curve_attack_index}",
+                # f"reached_end: {self.reached_curve_end}",
+                # f"pausing: {self.pausing}",
+                # f"pause_start: {self.pause_start_time}",
+                # f"is_capture: {self.is_capture_formation}"
             ]
 
             font = self.formation.game.FONT
 
-            # Posición inicial para dibujar el texto (ajusta según necesites)
-            text_x = int(self.x) - 250 + (self.mIndex % 4) * 80 
+            # # Posición inicial para dibujar el texto (ajusta según necesites)
+            # text_x = int(self.x) - 250 + (self.mIndex % 4) * 80 
+            # # Desplazamiento en Y basado en el mIndex para evitar superposición
+            # text_y = int(self.y) + 250 + (self.mIndex % 4) * 150  # Ajusta el multiplicador según sea necesario
+
+
+
+            text_x = int(self.x) 
             # Desplazamiento en Y basado en el mIndex para evitar superposición
-            text_y = int(self.y) + 250 + (self.mIndex % 4) * 150  # Ajusta el multiplicador según sea necesario
+            text_y = int(self.y) 
+
+
 
             # Color del texto
             text_color = (255, 255, 255)  # Blanco
 
             # Renderizar y dibujar cada línea de información
-            for i, line in enumerate(debug_info):
-                text_surface = font.render(line, True, text_color)
-                surface.blit(text_surface, (text_x, text_y + i * 25))
+            # for i, line in enumerate(debug_info):
+            #     text_surface = font.render(line, True, text_color)
+            #     surface.blit(text_surface, (text_x, text_y ))
 
     def get_rotated_image(self, angle):
         # Redondear el ángulo para limitar el número de rotaciones únicas
@@ -666,7 +674,7 @@ class Alien(pygame.sprite.Sprite):
             #Renderizar el texto del mIndex
             text = self.formation.game.FONT.render(str(self.mIndex), True, self.game.settings.WHITE)
             text_rect = text.get_rect(center=(int(self.x), int(self.y)))
-            #surface.blit(text, text_rect)
+            surface.blit(text, text_rect)
             
         #self.game.resources.draw_bezier_path(surface)
-        #self.debug_2(surface)
+        self.debug_2(surface)
